@@ -9,6 +9,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +72,7 @@ public abstract class Indicator extends Drawable implements Animatable {
 
     @Override
     public void start() {
+        Log.d("qintong1", "Indicator start1");
         ensureAnimators();
 
         if (mAnimators == null) {
@@ -83,6 +85,7 @@ public abstract class Indicator extends Drawable implements Animatable {
         }
         startAnimators();
         invalidateSelf();
+        Log.d("qintong1", "Indicator start");
     }
 
     private void startAnimators() {

@@ -2,15 +2,14 @@ package com.example.qintong.library;
 
 import android.animation.ValueAnimator;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
 import java.util.ArrayList;
 
-/**
- * Created by Jack on 2015/10/20.
- */
 public class SemiCircleSpinIndicator extends Indicator {
 
     private float degress;
@@ -21,6 +20,8 @@ public class SemiCircleSpinIndicator extends Indicator {
         //canvas.drawArc(rectF,-60,30,false,paint);
 
         float circleSpacing=4;
+        Log.d("qintong1", "onDraw " + degress);
+        paint.setColor(Color.BLACK);
         for (int i = 0 ; i < 30 ; i ++) {
             canvas.rotate(12,centerX(),centerY());
             RectF rectF=new RectF(0,0,getWidth(),getHeight());
