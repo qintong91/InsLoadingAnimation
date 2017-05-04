@@ -13,6 +13,8 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
@@ -20,12 +22,9 @@ import java.util.ArrayList;
 
 public class InsLoadingView  extends View {
 
-    Indicator mIndicator = new SemiCircleSpinIndicator();
     private float degress;
     private float arcWidth;
     private float cricleWidth;
-
-    private boolean mShouldStartAnimationDrawable = true;
 
     public InsLoadingView(Context context) {
         super(context);
@@ -59,22 +58,6 @@ public class InsLoadingView  extends View {
         postInvalidate();
     }
 
-    void drawTrack(Canvas canvas) {
-        final Drawable d = mIndicator;
-        if (d != null) {
-            // Translate canvas so a indeterminate circular progress bar with padding
-            // rotates properly in its animation
-            final int saveCount = canvas.save();
-            canvas.translate(getPaddingLeft(), getPaddingTop());
-            d.draw(canvas);
-            canvas.restoreToCount(saveCount);
-            if (mShouldStartAnimationDrawable) {
-                ((Animatable) d).start();
-                mShouldStartAnimationDrawable = false;
-            }
-        }
-    }
-
     void drawxxx(Canvas canvas, Paint paint) {
         paint.setColor(Color.BLACK);
         canvas.rotate(degress,centerX(),centerY());
@@ -83,14 +66,24 @@ public class InsLoadingView  extends View {
         RectF rectF=new RectF((float) (getWidth()*0.1),(float) (getWidth()*0.1),(float) (getWidth()*0.9), (float)(getHeight()*0.9));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth((float)(getHeight()*0.02));
-        canvas.drawArc(rectF,0,cricleWidth,false,paint);
-        for (int i = 0 ; i < 30 ; i ++) {
+        //canvas.drawArc(rectF,0,cricleWidth,false,paint);
+        for (int i = 0; i <= 4 ; i ++) {
+            if (12*i > cricleWidth) {
+                break;
+            }
+            canvas.drawArc(rectF,cricleWidth - 12*i,8 + i,false,paint);
+        }
+        if (cricleWidth > 48 ) {
+            canvas.drawArc(rectF,0,cricleWidth - 48,false,paint);
+        }
+
+/*        for (int i = 0 ; i < 30 ; i ++) {
             canvas.rotate(12,centerX(),centerY());
              paint.setStyle(Paint.Style.STROKE);
             paint.setColor(Color.BLUE);
             paint.setStrokeWidth((float)(getHeight()*0.02));
             canvas.drawArc(rectF,0,arcWidth,false,paint);
-        }
+        }*/
 
     }
 
@@ -102,18 +95,6 @@ public class InsLoadingView  extends View {
         setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
-    @Override
-    protected void drawableStateChanged() {
-        super.drawableStateChanged();
-        updateDrawableState();
-    }
-
-    private void updateDrawableState() {
-        final int[] state = getDrawableState();
-        if (mIndicator != null && mIndicator.isStateful()) {
-            mIndicator.setState(state);
-        }
-    }
     protected float centerX() {
         return getWidth()/2;
     }
@@ -128,7 +109,7 @@ public class InsLoadingView  extends View {
         rotateAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                degress= (float) animation.getAnimatedValue();
+                //degress= (float) animation.getAnimatedValue();
                 postInvalidate();
             }
         });
@@ -136,9 +117,9 @@ public class InsLoadingView  extends View {
         rotateAnim.setDuration(10000);
         rotateAnim.setRepeatCount(-1);
         animators.add(rotateAnim);
-        ValueAnimator arcAnim= ValueAnimator.ofFloat(12,0,12);
-        arcAnim.setInterpolator(new DeceAcceInterpolator());
-        arcAnim.setDuration(3000);
+        ValueAnimator arcAnim= ValueAnimator.ofFloat(12,0);
+        arcAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+        arcAnim.setDuration(1500);
         arcAnim.setRepeatCount(-1);
         arcAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -149,7 +130,7 @@ public class InsLoadingView  extends View {
         });
         animators.add(arcAnim);
         ValueAnimator circleDAnimator= ValueAnimator.ofFloat(-360,360);
-        circleDAnimator.setInterpolator(new DeceAcceInterpolator());
+        circleDAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         circleDAnimator.setDuration(3000);
         circleDAnimator.setRepeatCount(-1);
         circleDAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
