@@ -67,6 +67,7 @@ public class InsLoadingView  extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth((float)(getHeight()*0.02));
         //canvas.drawArc(rectF,0,cricleWidth,false,paint);
+        Log.d("qintong", "cricleWidth:" + cricleWidth);
         for (int i = 0; i <= 4 ; i ++) {
             if (12*i > cricleWidth) {
                 break;
@@ -75,6 +76,17 @@ public class InsLoadingView  extends View {
         }
         if (cricleWidth > 48 ) {
             canvas.drawArc(rectF,0,cricleWidth - 48,false,paint);
+        }
+
+        if (cricleWidth < 0) {
+            canvas.drawArc(rectF,cricleWidth,0-cricleWidth,false,paint);
+            float adjustCricleWidth = cricleWidth + 360;
+            float width = 12;
+            while (adjustCricleWidth > 0) {
+                width = width - 0.4f;
+                adjustCricleWidth = adjustCricleWidth -12;
+                canvas.drawArc(rectF,adjustCricleWidth ,width ,false,paint);
+            }
         }
 
 /*        for (int i = 0 ; i < 30 ; i ++) {
@@ -118,7 +130,7 @@ public class InsLoadingView  extends View {
         rotateAnim.setRepeatCount(-1);
         animators.add(rotateAnim);
         ValueAnimator arcAnim= ValueAnimator.ofFloat(12,0);
-        arcAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+        arcAnim.setInterpolator(new LinearInterpolator());
         arcAnim.setDuration(1500);
         arcAnim.setRepeatCount(-1);
         arcAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -130,8 +142,8 @@ public class InsLoadingView  extends View {
         });
         animators.add(arcAnim);
         ValueAnimator circleDAnimator= ValueAnimator.ofFloat(-360,360);
-        circleDAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        circleDAnimator.setDuration(3000);
+        circleDAnimator.setInterpolator(new LinearInterpolator());
+        circleDAnimator.setDuration(12000);
         circleDAnimator.setRepeatCount(-1);
         circleDAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
