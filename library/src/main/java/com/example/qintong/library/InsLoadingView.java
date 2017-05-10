@@ -3,23 +3,28 @@ package com.example.qintong.library;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 
 import static android.graphics.Shader.TileMode.CLAMP;
 
-public class InsLoadingView extends View {
+public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
     private static boolean DEBUG = true;
     private double circleDia = 0.9;
@@ -50,10 +55,15 @@ public class InsLoadingView extends View {
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        //super.onDraw(canvas);
         if (DEBUG) {
             Log.d(TAG, "onDraw " + getWidth() + "---" + getHeight());
         }
+        Paint bitmapPaint = new Paint();
+        setBitmapShader(bitmapPaint);
+        RectF rectF = new RectF((float) (getWidth() * (1 - circleDia)), (float) (getWidth() * (1 - circleDia)),
+                (float) (getWidth() * circleDia), (float) (getHeight() * circleDia));
+        canvas.drawOval(rectF,  bitmapPaint);
         Paint paint = getPaint(getColor(0), getColor(360) , 360);
         drawTrack(canvas, paint);
         postInvalidate();
@@ -171,7 +181,6 @@ public class InsLoadingView extends View {
                 isFirstCircle = !isFirstCircle;
             }
         });
-
         rotateAnim.start();
         arcAnim.start();
         circleDAnimator.start();
@@ -182,8 +191,8 @@ public class InsLoadingView extends View {
         if (degree < 0 || degree > 360) {
             Log.d(TAG, "getColor error:" + degree);
         }
-        int startColor = Color.YELLOW;
-        int endColor = Color.RED;
+        int startColor = Color.parseColor("#FFF700C2");
+        int endColor = Color.parseColor("#FFFFD900");
         double radio = degree/360;
         int redStart = Color.red(startColor);
         int blueStart = Color.blue(startColor);
@@ -206,5 +215,44 @@ public class InsLoadingView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(getHeight() * strokeWidth);
         return paint;
+    }
+
+    /**
+     * 设置BitmapShader
+     * https://my.oschina.net/zhangqie/blog/794363
+     */
+    private void setBitmapShader(Paint paint) {
+        Drawable drawable = getDrawable();
+        Matrix matrix = new Matrix();
+        if (null ==drawable) {
+            return;
+        }
+        Bitmap bitmap = drawableToBitmap(drawable);
+        // 将bitmap作为着色器来创建一个BitmapShader
+        BitmapShader tshader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        float scale =1.0f;
+            // 拿到bitmap宽或高的小值
+            int bSize =Math.min(bitmap.getWidth(), bitmap.getHeight());
+            scale = getWidth() * 1.0f /bSize;
+        // shader的变换矩阵，我们这里主要用于放大或者缩小
+            matrix.setScale(scale,scale);
+        // 设置变换矩阵
+            tshader.setLocalMatrix(matrix);
+            paint.setShader(tshader);
+
+    }
+
+    private Bitmap drawableToBitmap(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable =(BitmapDrawable) drawable;
+            return bitmapDrawable.getBitmap();
+        }
+        int w =drawable.getIntrinsicWidth();
+        int h =drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, w, h);
+        drawable.draw(canvas);
+        return bitmap;
     }
 }
