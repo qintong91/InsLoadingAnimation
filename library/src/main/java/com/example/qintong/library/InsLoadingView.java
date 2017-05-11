@@ -27,12 +27,11 @@ import static android.graphics.Shader.TileMode.CLAMP;
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
     private static boolean DEBUG = true;
-    private double circleDia = 0.9;
+    private float circleDia = 0.9f;
     private float strokeWidth = 0.025f;
     private float arcChangeAngle = 0.2f;
-
+    float bitmapDia = circleDia - strokeWidth;
     private float degress;
-    private float arcWidth;
     private float cricleWidth;
     boolean isFirstCircle = true;
 
@@ -55,16 +54,15 @@ public class InsLoadingView extends ImageView {
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
-        //super.onDraw(canvas);
         if (DEBUG) {
             Log.d(TAG, "onDraw " + getWidth() + "---" + getHeight());
         }
         Paint bitmapPaint = new Paint();
         setBitmapShader(bitmapPaint);
-        RectF rectF = new RectF((float) (getWidth() * (1 - circleDia)), (float) (getWidth() * (1 - circleDia)),
-                (float) (getWidth() * circleDia), (float) (getHeight() * circleDia));
-        canvas.drawOval(rectF,  bitmapPaint);
-        Paint paint = getPaint(getColor(0), getColor(360) , 360);
+        RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
+                getWidth() * bitmapDia, getHeight() * bitmapDia);
+        canvas.drawOval(rectF, bitmapPaint);
+        Paint paint = getPaint(getColor(0), getColor(360), 360);
         drawTrack(canvas, paint);
         postInvalidate();
     }
@@ -72,14 +70,14 @@ public class InsLoadingView extends ImageView {
     void drawTrack(Canvas canvas, Paint paint) {
         canvas.rotate(degress, centerX(), centerY());
         canvas.rotate(12, centerX(), centerY());
-        RectF rectF = new RectF((float) (getWidth() * (1 - circleDia)), (float) (getWidth() * (1 - circleDia)),
-                (float) (getWidth() * circleDia), (float) (getHeight() * circleDia));
+        RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
+                 getWidth() * circleDia, getHeight() * circleDia);
         if (DEBUG) {
             Log.d(TAG, "cricleWidth:" + cricleWidth);
         }
         if (cricleWidth < 0) {
             //a
-            float startArg = cricleWidth+ 360;
+            float startArg = cricleWidth + 360;
             canvas.drawArc(rectF, startArg, 360 - startArg, false, paint);
             float adjustCricleWidth = cricleWidth + 360;
             float width = 8;
@@ -107,7 +105,6 @@ public class InsLoadingView extends ImageView {
             while (width > 0 && adjustCricleWidth > 12) {
                 width = width - arcChangeAngle;
                 adjustCricleWidth = adjustCricleWidth - 12;
-                Log.d(TAG, "adjustCricleWidth:" + adjustCricleWidth);
                 canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
             }
         }
@@ -193,7 +190,7 @@ public class InsLoadingView extends ImageView {
         }
         int startColor = Color.parseColor("#FFF700C2");
         int endColor = Color.parseColor("#FFFFD900");
-        double radio = degree/360;
+        double radio = degree / 360;
         int redStart = Color.red(startColor);
         int blueStart = Color.blue(startColor);
         int greenStart = Color.green(startColor);
@@ -203,12 +200,12 @@ public class InsLoadingView extends ImageView {
         int red = (int) (redStart + ((redEnd - redStart) * radio + 0.5));
         int greed = (int) (greenStart + ((greenEnd - greenStart) * radio + 0.5));
         int blue = (int) (blueStart + ((blueEnd - blueStart) * radio + 0.5));
-        return Color.argb(255,red, greed, blue);
+        return Color.argb(255, red, greed, blue);
     }
 
     private Paint getPaint(int startColor, int endColor, double arcWidth) {
         Paint paint = new Paint();
-        Shader shader = new LinearGradient( 0f,  0f,  (float)(getWidth() * circleDia*(arcWidth - 48)/360),
+        Shader shader = new LinearGradient(0f, 0f, (float) (getWidth() * circleDia * (arcWidth - 48) / 360),
                 getHeight() * strokeWidth, startColor, endColor, CLAMP);
         //paint = new Paint();
         paint.setShader(shader);
@@ -224,32 +221,32 @@ public class InsLoadingView extends ImageView {
     private void setBitmapShader(Paint paint) {
         Drawable drawable = getDrawable();
         Matrix matrix = new Matrix();
-        if (null ==drawable) {
+        if (null == drawable) {
             return;
         }
         Bitmap bitmap = drawableToBitmap(drawable);
         // 将bitmap作为着色器来创建一个BitmapShader
         BitmapShader tshader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        float scale =1.0f;
-            // 拿到bitmap宽或高的小值
-            int bSize =Math.min(bitmap.getWidth(), bitmap.getHeight());
-            scale = getWidth() * 1.0f /bSize;
+        float scale = 1.0f;
+        // 拿到bitmap宽或高的小值
+        int bSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        scale = getWidth() * 1.0f / bSize;
         // shader的变换矩阵，我们这里主要用于放大或者缩小
-            matrix.setScale(scale,scale);
+        matrix.setScale(scale, scale);
         // 设置变换矩阵
-            tshader.setLocalMatrix(matrix);
-            paint.setShader(tshader);
+        tshader.setLocalMatrix(matrix);
+        paint.setShader(tshader);
 
     }
 
     private Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable =(BitmapDrawable) drawable;
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
             return bitmapDrawable.getBitmap();
         }
-        int w =drawable.getIntrinsicWidth();
-        int h =drawable.getIntrinsicHeight();
-        Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        int w = drawable.getIntrinsicWidth();
+        int h = drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, w, h);
         drawable.draw(canvas);
