@@ -16,5 +16,5 @@
         android:id="@+id/avi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/eric"/>
+        android:src="@mipmap/pink"/>
 </LinearLayout>

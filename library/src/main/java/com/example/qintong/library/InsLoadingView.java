@@ -112,10 +112,25 @@ public class InsLoadingView extends ImageView {
 
     @Override
     protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        final int measuredWidth = resolveSizeAndState(300, widthMeasureSpec, 0);
-        final int measuredHeight = resolveSizeAndState(300, heightMeasureSpec, 0);
-        setMeasuredDimension(measuredWidth, measuredHeight);
+        final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+        final int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+        final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+        final int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+        if (DEBUG) {
+            Log.d(TAG, "onMeasure EXACTLY:" + MeasureSpec.EXACTLY);
+            Log.d(TAG, "onMeasure AT_MOST:" + MeasureSpec.AT_MOST);
+            Log.d(TAG, "onMeasure UNSPECIFIED:" + MeasureSpec.UNSPECIFIED);
+            Log.d(TAG, "onMeasure widthMeasureSpec:" + widthSpecMode + "--" +widthSpecSize);
+            Log.d(TAG, "onMeasure heightMeasureSpec:" + heightSpecMode + "--" +heightSpecSize);
+        }
+        int width;
+        if (widthSpecMode == MeasureSpec.EXACTLY && heightSpecMode == MeasureSpec.EXACTLY) {
+            width = Math.min(widthSpecSize, heightSpecSize);
+        } else {
+            width = Math.min(widthSpecSize, heightSpecSize);
+            width = Math.min(width, 300);
+        }
+        setMeasuredDimension(width, width);
     }
 
     protected float centerX() {
@@ -186,7 +201,7 @@ public class InsLoadingView extends ImageView {
 
     private static int getColor(double degree) {
         if (degree < 0 || degree > 360) {
-            Log.d(TAG, "getColor error:" + degree);
+            Log.w(TAG, "getColor error:" + degree);
         }
         int startColor = Color.parseColor("#FFF700C2");
         int endColor = Color.parseColor("#FFFFD900");
@@ -234,9 +249,12 @@ public class InsLoadingView extends ImageView {
         // shader的变换矩阵，我们这里主要用于放大或者缩小
         matrix.setScale(scale, scale);
         // 设置变换矩阵
+        Log.d(TAG,"setBitmapShader:" +scale+ "--" +bitmap.getWidth() + "--"+ getWidth() +"---"+(bitmap.getWidth()*scale - getWidth())/2);
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            matrix.postTranslate(-(bitmap.getWidth()*scale - getWidth())/2, 0);
+        }
         tshader.setLocalMatrix(matrix);
         paint.setShader(tshader);
-
     }
 
     private Bitmap drawableToBitmap(Drawable drawable) {
