@@ -14,8 +14,11 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -27,36 +30,36 @@ import static android.graphics.Shader.TileMode.CLAMP;
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
     private static boolean DEBUG = true;
+    private long mRotateDuration = 10000;
+    private long mCircleDuration = 2000;
     private float circleDia = 0.9f;
     private float strokeWidth = 0.025f;
     private float arcChangeAngle = 0.2f;
+    private float arcWidth = 12;
     float bitmapDia = circleDia - strokeWidth;
     private float degress;
     private float cricleWidth;
     boolean isFirstCircle = true;
+    private ValueAnimator mRotateAnim;
+    private ValueAnimator mCircleAnim;
 
     public InsLoadingView(Context context) {
         super(context);
-        postInvalidate();
         onCreateAnimators();
     }
 
     public InsLoadingView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        postInvalidate();
         onCreateAnimators();
     }
 
     public InsLoadingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        postInvalidate();
+        onCreateAnimators();
     }
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
-        if (DEBUG) {
-            Log.d(TAG, "onDraw " + getWidth() + "---" + getHeight());
-        }
         Paint bitmapPaint = new Paint();
         setBitmapShader(bitmapPaint);
         RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
@@ -64,50 +67,17 @@ public class InsLoadingView extends ImageView {
         canvas.drawOval(rectF, bitmapPaint);
         Paint paint = getPaint(getColor(0), getColor(360), 360);
         drawTrack(canvas, paint);
-        postInvalidate();
     }
 
-    void drawTrack(Canvas canvas, Paint paint) {
-        canvas.rotate(degress, centerX(), centerY());
-        canvas.rotate(12, centerX(), centerY());
-        RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
-                 getWidth() * circleDia, getHeight() * circleDia);
-        if (DEBUG) {
-            Log.d(TAG, "cricleWidth:" + cricleWidth);
-        }
-        if (cricleWidth < 0) {
-            //a
-            float startArg = cricleWidth + 360;
-            canvas.drawArc(rectF, startArg, 360 - startArg, false, paint);
-            float adjustCricleWidth = cricleWidth + 360;
-            float width = 8;
-            while (adjustCricleWidth > 12) {
-                width = width - arcChangeAngle;
-                adjustCricleWidth = adjustCricleWidth - 12;
-                canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
-            }
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        Log.d(TAG, "onVisibilityChanged");
+        if (visibility == View.VISIBLE) {
+            startAnim();
         } else {
-            //b
-            for (int i = 0; i <= 4; i++) {
-                if (12 * i > cricleWidth) {
-                    break;
-                }
-                canvas.drawArc(rectF, cricleWidth - 12 * i, 8 + i, false, paint);
-            }
-            if (cricleWidth > 48) {
-                canvas.drawArc(rectF, 0, cricleWidth - 48, false, paint);
-            }
-            float adjustCricleWidth = 360;
-            float width = 8 * (360 - cricleWidth) / 360;
-            if (DEBUG) {
-                Log.d(TAG, "width:" + width);
-            }
-            while (width > 0 && adjustCricleWidth > 12) {
-                width = width - arcChangeAngle;
-                adjustCricleWidth = adjustCricleWidth - 12;
-                canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
-            }
+            endAnim();
         }
+        super.onVisibilityChanged(changedView, visibility);
     }
 
     @Override
@@ -117,9 +87,6 @@ public class InsLoadingView extends ImageView {
         final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
         final int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
         if (DEBUG) {
-            Log.d(TAG, "onMeasure EXACTLY:" + MeasureSpec.EXACTLY);
-            Log.d(TAG, "onMeasure AT_MOST:" + MeasureSpec.AT_MOST);
-            Log.d(TAG, "onMeasure UNSPECIFIED:" + MeasureSpec.UNSPECIFIED);
             Log.d(TAG, "onMeasure widthMeasureSpec:" + widthSpecMode + "--" +widthSpecSize);
             Log.d(TAG, "onMeasure heightMeasureSpec:" + heightSpecMode + "--" +heightSpecSize);
         }
@@ -141,26 +108,23 @@ public class InsLoadingView extends ImageView {
         return getHeight() / 2;
     }
 
-    public ArrayList<ValueAnimator> onCreateAnimators() {
-        ArrayList<ValueAnimator> animators = new ArrayList<>();
-        ValueAnimator rotateAnim = ValueAnimator.ofFloat(0, 180, 360);
-        rotateAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    public void onCreateAnimators() {
+        mRotateAnim = ValueAnimator.ofFloat(0, 180, 360);
+        mRotateAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 degress = (float) animation.getAnimatedValue();
                 postInvalidate();
             }
         });
-        rotateAnim.setInterpolator(new LinearInterpolator());
-        rotateAnim.setDuration(10000);
-        rotateAnim.setRepeatCount(-1);
-        animators.add(rotateAnim);
-        ValueAnimator arcAnim = ValueAnimator.ofFloat(12, 0);
-        ValueAnimator circleDAnimator = ValueAnimator.ofFloat(0, 360);
-        circleDAnimator.setInterpolator(new DecelerateInterpolator());
-        circleDAnimator.setDuration(3000);
-        circleDAnimator.setRepeatCount(-1);
-        circleDAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mRotateAnim.setInterpolator(new LinearInterpolator());
+        mRotateAnim.setDuration(mRotateDuration);
+        mRotateAnim.setRepeatCount(-1);
+        mCircleAnim = ValueAnimator.ofFloat(0, 360);
+        mCircleAnim.setInterpolator(new DecelerateInterpolator());
+        mCircleAnim.setDuration(mCircleDuration);
+        mCircleAnim.setRepeatCount(-1);
+        mCircleAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 if (isFirstCircle) {
@@ -168,11 +132,10 @@ public class InsLoadingView extends ImageView {
                 } else {
                     cricleWidth = (float) animation.getAnimatedValue() - 360;
                 }
-                Log.d(TAG, "cricleWidth: " + cricleWidth + " isFirstCircle:" + isFirstCircle);
                 postInvalidate();
             }
         });
-        circleDAnimator.addListener(new Animator.AnimatorListener() {
+        mCircleAnim.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
 
@@ -193,10 +156,60 @@ public class InsLoadingView extends ImageView {
                 isFirstCircle = !isFirstCircle;
             }
         });
-        rotateAnim.start();
-        arcAnim.start();
-        circleDAnimator.start();
-        return animators;
+        startAnim();
+    }
+
+    private void drawTrack(Canvas canvas, Paint paint) {
+        canvas.rotate(degress, centerX(), centerY());
+        canvas.rotate(arcWidth, centerX(), centerY());
+        RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
+                getWidth() * circleDia, getHeight() * circleDia);
+        if (DEBUG) {
+            Log.d(TAG, "cricleWidth:" + cricleWidth);
+        }
+        if (cricleWidth < 0) {
+            //a
+            float startArg = cricleWidth + 360;
+            canvas.drawArc(rectF, startArg, 360 - startArg, false, paint);
+            float adjustCricleWidth = cricleWidth + 360;
+            float width = 8;
+            while (adjustCricleWidth > arcWidth) {
+                width = width - arcChangeAngle;
+                adjustCricleWidth = adjustCricleWidth - arcWidth;
+                canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
+            }
+        } else {
+            //b
+            for (int i = 0; i <= 4; i++) {
+                if (arcWidth * i > cricleWidth) {
+                    break;
+                }
+                canvas.drawArc(rectF, cricleWidth - arcWidth * i, 8 + i, false, paint);
+            }
+            if (cricleWidth > 48) {
+                canvas.drawArc(rectF, 0, cricleWidth - 48, false, paint);
+            }
+            float adjustCricleWidth = 360;
+            float width = 8 * (360 - cricleWidth) / 360;
+            if (DEBUG) {
+                Log.d(TAG, "width:" + width);
+            }
+            while (width > 0 && adjustCricleWidth > arcWidth) {
+                width = width - arcChangeAngle;
+                adjustCricleWidth = adjustCricleWidth - arcWidth;
+                canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
+            }
+        }
+    }
+
+    private void startAnim() {
+        mRotateAnim.start();
+        mCircleAnim.start();
+    }
+
+    private void endAnim() {
+        mRotateAnim.end();
+        mCircleAnim.end();
     }
 
     private static int getColor(double degree) {
@@ -222,7 +235,6 @@ public class InsLoadingView extends ImageView {
         Paint paint = new Paint();
         Shader shader = new LinearGradient(0f, 0f, (float) (getWidth() * circleDia * (arcWidth - 48) / 360),
                 getHeight() * strokeWidth, startColor, endColor, CLAMP);
-        //paint = new Paint();
         paint.setShader(shader);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(getHeight() * strokeWidth);
@@ -240,18 +252,15 @@ public class InsLoadingView extends ImageView {
             return;
         }
         Bitmap bitmap = drawableToBitmap(drawable);
-        // 将bitmap作为着色器来创建一个BitmapShader
         BitmapShader tshader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         float scale = 1.0f;
-        // 拿到bitmap宽或高的小值
         int bSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
         scale = getWidth() * 1.0f / bSize;
-        // shader的变换矩阵，我们这里主要用于放大或者缩小
         matrix.setScale(scale, scale);
-        // 设置变换矩阵
-        Log.d(TAG,"setBitmapShader:" +scale+ "--" +bitmap.getWidth() + "--"+ getWidth() +"---"+(bitmap.getWidth()*scale - getWidth())/2);
         if (bitmap.getWidth() > bitmap.getHeight()) {
             matrix.postTranslate(-(bitmap.getWidth()*scale - getWidth())/2, 0);
+        } else {
+            matrix.postTranslate(0, -(bitmap.getHeight()*scale - getHeight())/2);
         }
         tshader.setLocalMatrix(matrix);
         paint.setShader(tshader);
