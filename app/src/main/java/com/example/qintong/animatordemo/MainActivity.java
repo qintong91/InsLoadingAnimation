@@ -2,21 +2,18 @@ package com.example.qintong.animatordemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import com.example.qintong.library.InsLoadingView;
 
 public class MainActivity extends AppCompatActivity {
-
+    InsLoadingView mInsLoadingView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("qintong1", "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        InsLoadingView view;
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("qintong1", "onResume");
+        mInsLoadingView = (InsLoadingView) findViewById(R.id.loading_view);
+/*        mInsLoadingView.setCircleDuration(2000);
+        mInsLoadingView.setRotateDuration(10000);
+        mInsLoadingView.setStartColor(Color.YELLOW);
+        mInsLoadingView.setEndColor(Color.BLUE);*/
     }
 }

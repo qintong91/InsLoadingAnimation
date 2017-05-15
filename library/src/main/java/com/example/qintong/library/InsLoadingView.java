@@ -3,6 +3,7 @@ package com.example.qintong.library;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -26,8 +27,8 @@ import static android.graphics.Shader.TileMode.CLAMP;
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
     private static boolean DEBUG = true;
-    private long mRotateDuration = 10000;
-    private long mCircleDuration = 2000;
+    private int mRotateDuration = 10000;
+    private int mCircleDuration = 2000;
     private float circleDia = 0.9f;
     private float strokeWidth = 0.025f;
     private float arcChangeAngle = 0.2f;
@@ -38,6 +39,8 @@ public class InsLoadingView extends ImageView {
     boolean isFirstCircle = true;
     private ValueAnimator mRotateAnim;
     private ValueAnimator mCircleAnim;
+    int mStartColor = Color.parseColor("#FFF700C2");
+    int mEndColor = Color.parseColor("#FFFFD900");
 
     public InsLoadingView(Context context) {
         super(context);
@@ -46,12 +49,34 @@ public class InsLoadingView extends ImageView {
 
     public InsLoadingView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        praseAttrs(context, attrs);
         onCreateAnimators();
     }
 
     public InsLoadingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        praseAttrs(context, attrs);
         onCreateAnimators();
+    }
+
+    public InsLoadingView setCircleDuration(int circleDuration) {
+        this.mCircleDuration = circleDuration;
+        mCircleAnim.setDuration(mCircleDuration);
+        return this;
+    }
+
+    public InsLoadingView setRotateDuration(int rotateDuration) {
+        this.mRotateDuration = rotateDuration;
+        mRotateAnim.setDuration(mRotateDuration);
+        return this;
+    }
+
+    public void setStartColor(int startColor) {
+        mStartColor = startColor;
+    }
+
+    public void setEndColor(int endColor) {
+        mEndColor = endColor;
     }
 
     @Override
@@ -96,15 +121,37 @@ public class InsLoadingView extends ImageView {
         setMeasuredDimension(width, width);
     }
 
-    protected float centerX() {
+    private void praseAttrs(Context context, AttributeSet attrs) {
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.InsLoadingViewAttr);
+        int startColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mStartColor);
+        int endColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mEndColor);
+        int circleDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_circle_duration, mCircleDuration);
+        int rotateDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_rotate_duration, mRotateDuration);
+        if (DEBUG) {
+            Log.d(TAG,"praseAttrs start_color: " + startColor);
+            Log.d(TAG,"praseAttrs end_color: " + endColor);
+            Log.d(TAG,"praseAttrs rotate_duration: " + rotateDuration);
+            Log.d(TAG,"praseAttrs circle_duration: " + circleDuration);
+        }
+        if (circleDuration != mCircleDuration) {
+            setCircleDuration(circleDuration);
+        }
+        if (rotateDuration != mRotateDuration) {
+            setRotateDuration(rotateDuration);
+        }
+        setStartColor(startColor);
+        setEndColor(endColor);
+    }
+
+    private float centerX() {
         return getWidth() / 2;
     }
 
-    protected float centerY() {
+    private float centerY() {
         return getHeight() / 2;
     }
 
-    public void onCreateAnimators() {
+    private void onCreateAnimators() {
         mRotateAnim = ValueAnimator.ofFloat(0, 180, 360);
         mRotateAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -208,19 +255,17 @@ public class InsLoadingView extends ImageView {
         mCircleAnim.end();
     }
 
-    private static int getColor(double degree) {
+    private int getColor(double degree) {
         if (degree < 0 || degree > 360) {
             Log.w(TAG, "getColor error:" + degree);
         }
-        int startColor = Color.parseColor("#FFF700C2");
-        int endColor = Color.parseColor("#FFFFD900");
         double radio = degree / 360;
-        int redStart = Color.red(startColor);
-        int blueStart = Color.blue(startColor);
-        int greenStart = Color.green(startColor);
-        int redEnd = Color.red(endColor);
-        int blueEnd = Color.blue(endColor);
-        int greenEnd = Color.green(endColor);
+        int redStart = Color.red(mStartColor);
+        int blueStart = Color.blue(mStartColor);
+        int greenStart = Color.green(mStartColor);
+        int redEnd = Color.red(mEndColor);
+        int blueEnd = Color.blue(mEndColor);
+        int greenEnd = Color.green(mEndColor);
         int red = (int) (redStart + ((redEnd - redStart) * radio + 0.5));
         int greed = (int) (greenStart + ((greenEnd - greenStart) * radio + 0.5));
         int blue = (int) (blueStart + ((blueEnd - blueStart) * radio + 0.5));
@@ -237,10 +282,6 @@ public class InsLoadingView extends ImageView {
         return paint;
     }
 
-    /**
-     * 设置BitmapShader
-     * https://my.oschina.net/zhangqie/blog/794363
-     */
     private void setBitmapShader(Paint paint) {
         Drawable drawable = getDrawable();
         Matrix matrix = new Matrix();
