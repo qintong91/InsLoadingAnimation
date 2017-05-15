@@ -14,16 +14,12 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
-
-import java.util.ArrayList;
 
 import static android.graphics.Shader.TileMode.CLAMP;
 
@@ -70,7 +66,7 @@ public class InsLoadingView extends ImageView {
     }
 
     @Override
-    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+    protected void onVisibilityChanged(View changedView, int visibility) {
         Log.d(TAG, "onVisibilityChanged");
         if (visibility == View.VISIBLE) {
             startAnim();
