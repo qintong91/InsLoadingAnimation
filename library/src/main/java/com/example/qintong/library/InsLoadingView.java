@@ -17,6 +17,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
@@ -27,20 +28,24 @@ import static android.graphics.Shader.TileMode.CLAMP;
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
     private static boolean DEBUG = true;
+    enum Status {LOADING, CLICKED, UNCLICKED};
+
+    private Status mStatus = Status.LOADING;
     private int mRotateDuration = 10000;
     private int mCircleDuration = 2000;
     private float circleDia = 0.9f;
     private float strokeWidth = 0.025f;
     private float arcChangeAngle = 0.2f;
     private float arcWidth = 12;
-    float bitmapDia = circleDia - strokeWidth;
+    private float bitmapDia = circleDia - strokeWidth;
     private float degress;
     private float cricleWidth;
-    boolean isFirstCircle = true;
+    private boolean isFirstCircle = true;
     private ValueAnimator mRotateAnim;
     private ValueAnimator mCircleAnim;
-    int mStartColor = Color.parseColor("#FFF700C2");
-    int mEndColor = Color.parseColor("#FFFFD900");
+    private int mStartColor = Color.parseColor("#FFF700C2");
+    private int mEndColor = Color.parseColor("#FFFFD900");
+    private float mScale = 1f;
 
     public InsLoadingView(Context context) {
         super(context);
@@ -80,28 +85,6 @@ public class InsLoadingView extends ImageView {
     }
 
     @Override
-    protected synchronized void onDraw(Canvas canvas) {
-        Paint bitmapPaint = new Paint();
-        setBitmapShader(bitmapPaint);
-        RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
-                getWidth() * bitmapDia, getHeight() * bitmapDia);
-        canvas.drawOval(rectF, bitmapPaint);
-        Paint paint = getPaint(getColor(0), getColor(360), 360);
-        drawTrack(canvas, paint);
-    }
-
-    @Override
-    protected void onVisibilityChanged(View changedView, int visibility) {
-        Log.d(TAG, "onVisibilityChanged");
-        if (visibility == View.VISIBLE) {
-            startAnim();
-        } else {
-            endAnim();
-        }
-        super.onVisibilityChanged(changedView, visibility);
-    }
-
-    @Override
     protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
         final int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -119,6 +102,71 @@ public class InsLoadingView extends ImageView {
             width = Math.min(width, 300);
         }
         setMeasuredDimension(width, width);
+    }
+
+    @Override
+    protected synchronized void onDraw(Canvas canvas) {
+        Log.d(TAG, "mScale:" + mScale);
+        canvas.scale(mScale, mScale, centerX(), centerY());
+        Paint bitmapPaint = new Paint();
+        setBitmapShader(bitmapPaint);
+        RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
+                getWidth() * bitmapDia, getHeight() * bitmapDia);
+        canvas.drawOval(rectF, bitmapPaint);
+        Paint paint = getPaint(getColor(0), getColor(360), 360);
+        switch (mStatus) {
+            case LOADING:
+                drawTrack(canvas, paint);
+                break;
+            case UNCLICKED:
+                drawCircle(canvas, paint);
+                break;
+            case CLICKED:
+                // TO DO
+                drawCircle(canvas, paint);
+                break;
+        }
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        Log.d(TAG, "onVisibilityChanged");
+        if (visibility == View.VISIBLE) {
+            startAnim();
+        } else {
+            endAnim();
+        }
+        super.onVisibilityChanged(changedView, visibility);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (DEBUG) {
+            Log.d(TAG, "dispatchTouchEvent: " + event.getAction());
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (DEBUG) {
+            Log.d(TAG, "onTouchEvent: " + event.getAction());
+        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                startDownAnim();
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                startUpAnim();
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                startUpAnim();
+                break;
+            }
+        }
+        return super.onTouchEvent(event);
     }
 
     private void praseAttrs(Context context, AttributeSet attrs) {
@@ -243,6 +291,20 @@ public class InsLoadingView extends ImageView {
                 canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
             }
         }
+    }
+
+    private void drawCircle(Canvas canvas, Paint paint) {
+        RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
+                getWidth() * circleDia, getHeight() * circleDia);
+        canvas.drawOval(rectF ,paint);
+    }
+
+    private void startDownAnim() {
+        mScale = 0.9f;
+    }
+
+    private void startUpAnim() {
+        mScale = 1f;
     }
 
     private void startAnim() {
