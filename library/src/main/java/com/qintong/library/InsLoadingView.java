@@ -17,6 +17,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -27,10 +28,18 @@ import static android.graphics.Shader.TileMode.CLAMP;
 
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = BuildConfig.DEBUG;
     private static final float ARC_WIDTH = 12;
 
     public enum Status {LOADING, CLICKED, UNCLICKED};
+    private static SparseArray<Status> sStatusArray;
+
+    static {
+        sStatusArray = new SparseArray<>(3);
+        sStatusArray.put(0, Status.LOADING);
+        sStatusArray.put(1, Status.CLICKED);
+        sStatusArray.put(2, Status.UNCLICKED);
+    }
 
     private Status mStatus = Status.LOADING;
     private int mRotateDuration = 10000;
@@ -48,7 +57,6 @@ public class InsLoadingView extends ImageView {
     private int mStartColor = Color.parseColor("#FFF700C2");
     private int mEndColor = Color.parseColor("#FFFFD900");
     private float mScale = 1f;
-    private boolean shrinking;
 
     public InsLoadingView(Context context) {
         super(context);
@@ -117,7 +125,6 @@ public class InsLoadingView extends ImageView {
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
-        Log.d(TAG, "mScale:" + mScale);
         canvas.scale(mScale, mScale, centerX(), centerY());
         Paint bitmapPaint = new Paint();
         setBitmapShader(bitmapPaint);
@@ -183,11 +190,13 @@ public class InsLoadingView extends ImageView {
         int endColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mEndColor);
         int circleDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_circle_duration, mCircleDuration);
         int rotateDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_rotate_duration, mRotateDuration);
+        int status = typedArray.getInt(R.styleable.InsLoadingViewAttr_status, 0);
         if (DEBUG) {
             Log.d(TAG, "praseAttrs start_color: " + startColor);
             Log.d(TAG, "praseAttrs end_color: " + endColor);
             Log.d(TAG, "praseAttrs rotate_duration: " + rotateDuration);
             Log.d(TAG, "praseAttrs circle_duration: " + circleDuration);
+            Log.d(TAG, "praseAttrs status: " + status);
         }
         if (circleDuration != mCircleDuration) {
             setCircleDuration(circleDuration);
@@ -197,6 +206,7 @@ public class InsLoadingView extends ImageView {
         }
         setStartColor(startColor);
         setEndColor(endColor);
+        setStatus(sStatusArray.get(status));
     }
 
     private float centerX() {

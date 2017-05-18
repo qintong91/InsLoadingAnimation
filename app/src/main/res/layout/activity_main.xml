@@ -16,5 +16,6 @@
         android:id="@+id/loading_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:status="clicked"
         android:src="@mipmap/pink"/>
 </LinearLayout>
