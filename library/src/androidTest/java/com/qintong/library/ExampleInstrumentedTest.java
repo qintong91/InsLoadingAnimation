@@ -1,4 +1,4 @@
-package com.example.qintong.library;
+package com.qintong.library;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

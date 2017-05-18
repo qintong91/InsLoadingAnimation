@@ -1,4 +1,4 @@
-package com.example.qintong.library;
+package com.qintong.library;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -102,8 +102,8 @@ public class InsLoadingView extends ImageView {
         final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
         final int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
         if (DEBUG) {
-            Log.d(TAG, "onMeasure widthMeasureSpec:" + widthSpecMode + "--" +widthSpecSize);
-            Log.d(TAG, "onMeasure heightMeasureSpec:" + heightSpecMode + "--" +heightSpecSize);
+            Log.d(TAG, "onMeasure widthMeasureSpec:" + widthSpecMode + "--" + widthSpecSize);
+            Log.d(TAG, "onMeasure heightMeasureSpec:" + heightSpecMode + "--" + heightSpecSize);
         }
         int width;
         if (widthSpecMode == MeasureSpec.EXACTLY && heightSpecMode == MeasureSpec.EXACTLY) {
@@ -184,10 +184,10 @@ public class InsLoadingView extends ImageView {
         int circleDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_circle_duration, mCircleDuration);
         int rotateDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_rotate_duration, mRotateDuration);
         if (DEBUG) {
-            Log.d(TAG,"praseAttrs start_color: " + startColor);
-            Log.d(TAG,"praseAttrs end_color: " + endColor);
-            Log.d(TAG,"praseAttrs rotate_duration: " + rotateDuration);
-            Log.d(TAG,"praseAttrs circle_duration: " + circleDuration);
+            Log.d(TAG, "praseAttrs start_color: " + startColor);
+            Log.d(TAG, "praseAttrs end_color: " + endColor);
+            Log.d(TAG, "praseAttrs rotate_duration: " + rotateDuration);
+            Log.d(TAG, "praseAttrs circle_duration: " + circleDuration);
         }
         if (circleDuration != mCircleDuration) {
             setCircleDuration(circleDuration);
@@ -314,7 +314,7 @@ public class InsLoadingView extends ImageView {
     private void drawCircle(Canvas canvas, Paint paint) {
         RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
                 getWidth() * circleDia, getHeight() * circleDia);
-        canvas.drawOval(rectF ,paint);
+        canvas.drawOval(rectF, paint);
     }
 
     private void startDownAnim() {
@@ -382,9 +382,9 @@ public class InsLoadingView extends ImageView {
         scale = getWidth() * 1.0f / bSize;
         matrix.setScale(scale, scale);
         if (bitmap.getWidth() > bitmap.getHeight()) {
-            matrix.postTranslate(-(bitmap.getWidth()*scale - getWidth())/2, 0);
+            matrix.postTranslate(-(bitmap.getWidth() * scale - getWidth()) / 2, 0);
         } else {
-            matrix.postTranslate(0, -(bitmap.getHeight()*scale - getHeight())/2);
+            matrix.postTranslate(0, -(bitmap.getHeight() * scale - getHeight()) / 2);
         }
         tshader.setLocalMatrix(matrix);
         paint.setShader(tshader);
