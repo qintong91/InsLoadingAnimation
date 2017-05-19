@@ -7,6 +7,28 @@
 
 ## Usage
 
+### Step 1
+
+```
+dependencies {
+  compile 'com.qintong:insLoadingAnimation:0.9.1'
+}
+```
+
+###Step 2
+
+InsLoadingView is extands ImageView.
+
+Simple
+```xml
+<com.qintong.library.InsLoadingView
+    android:layout_centerInParent="true"
+    android:id="@+id/loading_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@mipmap/pink"/>
+```
+
 ## Contact me
 
 ### License
