@@ -2,6 +2,9 @@
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/qintong000/maven/insLoadingAnimation/images/download.svg)](https://bintray.com/qintong000/maven/insLoadingAnimation/_latestVersion)
 
+## Introduction
+InsLoadingAnimation is imitation of instagram and weibo loading animation ImageView for Android.
+
 ## Demo
 ![avi](screenshots/demo.gif)
 
@@ -17,7 +20,7 @@ dependencies {
 
 ###Step 2
 
-InsLoadingView is extands ImageView.
+InsLoadingView is extands ImageView, it can be used like ImageView.
 
 Simple
 ```xml
@@ -29,7 +32,48 @@ Simple
     android:src="@mipmap/pink"/>
 ```
 
-## Contact me
+Advance
+
+####Set status of InsLoadingView only requires the following code:
+
+xml:
+```xml
+  app:status="loading" //or "clicked",or "clicked"
+```
+java:
+```java
+  mInsLoadingView.setStatus(InsLoadingView.Status.LOADING); //Or InsLoadingView.Status.CLICKED, InsLoadingView.Status.UNCLICKED
+```
+
+####Set the color of InsLoadingView
+You can set the start color and end color, the circle of InsLoadingView will show the transition of this two colors:
+
+xml:
+```xml
+  app:start_color="#FFF700C2" //or your color
+  app:end_color="#FFFFD900" //or your color
+```
+
+java:
+```java
+  mInsLoadingView.setStartColor(Color.YELLOW); //or your color
+  mInsLoadingView.setEndColor(Color.BLUE); //or your color
+```
+
+####Set the speed of InsLoadingView.
+
+You can change the speed of animation by set the circle animation duration or whole animation rotating duration(MS):
+
+xml:
+```xml
+  app:circle_duration="2000"
+  app:rotate_duration="10000"
+```
+
+```java
+  mInsLoadingView.setCircleDuration(2000);
+  mInsLoadingView.setRotateDuration(10000);
+```
 
 ### License
 ```
