@@ -12,17 +12,18 @@ InsLoadingAnimation is imitation of instagram and weibo loading animation ImageV
 
 ### Step 1
 
+Add dependencies in build.gradle.
+
 ```
 dependencies {
   compile 'com.qintong:insLoadingAnimation:0.9.1'
 }
 ```
 
-###Step 2
+### Step 2
 
 InsLoadingView is extands ImageView, it can be used like ImageView.
 
-Simple
 ```xml
 <com.qintong.library.InsLoadingView
     android:layout_centerInParent="true"
@@ -32,10 +33,10 @@ Simple
     android:src="@mipmap/pink"/>
 ```
 
-Advance
+### Step 3
 
-####Set status of InsLoadingView only requires the following code:
-
+#### Set status of InsLoadingView
+Set status of InsLoadingView only requires the following code:
 xml:
 ```xml
   app:status="loading" //or "clicked",or "clicked"
@@ -45,7 +46,7 @@ java:
   mInsLoadingView.setStatus(InsLoadingView.Status.LOADING); //Or InsLoadingView.Status.CLICKED, InsLoadingView.Status.UNCLICKED
 ```
 
-####Set the color of InsLoadingView
+#### Set the color of InsLoadingView
 You can set the start color and end color, the circle of InsLoadingView will show the transition of this two colors:
 
 xml:
@@ -60,7 +61,7 @@ java:
   mInsLoadingView.setEndColor(Color.BLUE); //or your color
 ```
 
-####Set the speed of InsLoadingView.
+#### Set the speed of InsLoadingView.
 
 You can change the speed of animation by set the circle animation duration or whole animation rotating duration(MS):
 
