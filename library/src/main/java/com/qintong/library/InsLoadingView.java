@@ -31,7 +31,8 @@ public class InsLoadingView extends ImageView {
     private static boolean DEBUG = BuildConfig.DEBUG;
     private static final float ARC_WIDTH = 12;
 
-    public enum Status {LOADING, CLICKED, UNCLICKED};
+    public enum Status {LOADING, CLICKED, UNCLICKED}
+
     private static SparseArray<Status> sStatusArray;
 
     static {
@@ -142,7 +143,7 @@ public class InsLoadingView extends ImageView {
             case CLICKED:
                 // TO DO
                 Paint paintClicked = new Paint();
-                paint.setColor(Color.GRAY);
+                paintClicked.setColor(Color.LTGRAY);
                 setPaintStroke(paintClicked);
                 drawCircle(canvas, paintClicked);
                 break;

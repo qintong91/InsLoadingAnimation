@@ -3,7 +3,7 @@
 [![Download](https://api.bintray.com/packages/qintong000/maven/insLoadingAnimation/images/download.svg)](https://bintray.com/qintong000/maven/insLoadingAnimation/_latestVersion)
 
 ## Introduction
-InsLoadingAnimation is imitation of instagram and weibo loading animation ImageView for Android.
+InsLoadingAnimation is imitation of instagram and weibo avator animation of loading for Android.
 
 ## Demo
 ![avi](screenshots/demo.gif)
@@ -36,6 +36,12 @@ InsLoadingView is extands ImageView, it can be used like ImageView.
 ### Step 3
 
 #### Set status of InsLoadingView
+You can change the status of InsLoadingView manually to match up it's status in your context.
+The status of InsLoadingView:
+LOADING: to show this InsLoadingView has been clicked and before it has been loaded, animation of circle is running.
+UNCLICKED: to show this InsLoadingView neither has been clicked nor loaded, the animation of circle is stopped.
+CLICKED: to show this InsLoadingView has been clicked and loaded, the animation of circle is stopped and the color of the circle is gray.
+
 Set status of InsLoadingView only requires the following code:
 
 xml:
