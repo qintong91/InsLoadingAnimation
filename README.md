@@ -37,10 +37,12 @@ InsLoadingView is extands ImageView, it can be used like ImageView.
 
 #### Set status of InsLoadingView
 Set status of InsLoadingView only requires the following code:
+
 xml:
 ```xml
   app:status="loading" //or "clicked",or "clicked"
 ```
+
 java:
 ```java
   mInsLoadingView.setStatus(InsLoadingView.Status.LOADING); //Or InsLoadingView.Status.CLICKED, InsLoadingView.Status.UNCLICKED
@@ -71,6 +73,7 @@ xml:
   app:rotate_duration="10000"
 ```
 
+java:
 ```java
   mInsLoadingView.setCircleDuration(2000);
   mInsLoadingView.setRotateDuration(10000);
