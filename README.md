@@ -54,7 +54,6 @@ java:
 ```
 
 #### 设置颜色
-
 设置start color和start color，InsLoadingView的圆圈会显示两个颜色间的过渡。
 可以按如下代码设置：
 
@@ -72,7 +71,6 @@ java:
 默认的start color和start color为#FFF700C2和#FFFFD900。
 
 #### 设置速度
-
 通过设置环绕动画的时间和整体旋转的时间来改变速度：
 
 xml:
