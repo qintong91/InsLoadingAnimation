@@ -1,6 +1,7 @@
 # InsLoadingAnimation
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/qintong000/maven/insLoadingAnimation/images/download.svg)](https://bintray.com/qintong000/maven/insLoadingAnimation/_latestVersion)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-InsLoadingAnimation-green.svg?style=flat)](https://android-arsenal.com/details/1/5789)
 
 ## 简介
 InsLoadingAnimation 是仿instagram和微博的头像点击进行加载的Android动画。
