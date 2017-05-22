@@ -2,17 +2,17 @@
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/qintong000/maven/insLoadingAnimation/images/download.svg)](https://bintray.com/qintong000/maven/insLoadingAnimation/_latestVersion)
 
-## Introduction
-InsLoadingAnimation is imitation of instagram and weibo avator animation of loading for Android.
+## 简介
+InsLoadingAnimation 是仿instagram和微博的头像点击进行加载的Android动画。
 
 ## Demo
 ![avi](screenshots/demo.gif)
 
-## Usage
+## 使用
 
 ### Step 1
 
-Add dependencies in build.gradle.
+在build.gradle增加依赖：
 
 ```
 dependencies {
@@ -22,7 +22,7 @@ dependencies {
 
 ### Step 2
 
-InsLoadingView is extands ImageView, it can be used like ImageView simply.
+InsLoadingView继承自ImageView, 所以最基本的，可以按照ImageView的用法使用InsLoadingView：
 
 ```xml
 <com.qintong.library.InsLoadingView
@@ -35,15 +35,14 @@ InsLoadingView is extands ImageView, it can be used like ImageView simply.
 
 ### Step 3
 
-#### Set status of InsLoadingView
-You can change the status of InsLoadingView manually to match up it's status in your context.
-The status of InsLoadingView:
-LOADING: to show this InsLoadingView has been clicked and before it has been loaded, animation of circle is running.
-UNCLICKED: to show this InsLoadingView neither has been clicked nor loaded, the animation of circle is stopped.
-CLICKED: to show this InsLoadingView has been clicked and loaded, the animation of circle is stopped and the color of the circle is gray.
-The default status is LOADING.
-Set status of InsLoadingView only requires the following code:
+#### 设置状态：
+您可以手动设置其状态，来对应在您应用中的当前状态。InsLoadingView的状态有：
+LOADING: 表示InsLoadingView被点击之后正在加载内容(未加载完毕之前)，该状态下动画正在执行。
+UNCLICKED: 该InsLoadingView被点击之前的状态，此状态下动画停止。
+CLICKED: 表示InsLoadingView被点击和加载过，此状态下动画停止切圆圈的颜色为灰色。
+默认的状态是LOADING。
 
+可以通过一下代码设置状态：
 xml:
 ```xml
   app:status="loading" //or "clicked",or "clicked"
@@ -54,8 +53,9 @@ java:
   mInsLoadingView.setStatus(InsLoadingView.Status.LOADING); //Or InsLoadingView.Status.CLICKED, InsLoadingView.Status.UNCLICKED
 ```
 
-#### Set the color of InsLoadingView
-You can set the start color and end color, the circle of InsLoadingView will show the transition of this two colors:
+#### 设置颜色
+设置start color和start color，InsLoadingView的圆圈会显示两个颜色间的过渡。
+可以按如下代码设置：
 
 xml:
 ```xml
@@ -68,11 +68,10 @@ java:
   mInsLoadingView.setStartColor(Color.YELLOW); //or your color
   mInsLoadingView.setEndColor(Color.BLUE); //or your color
 ```
-The default start color and end color is #FFF700C2 and #FFFFD900.
+默认的start color和start color为#FFF700C2和#FFFFD900。
 
-#### Set the speed of InsLoadingView.
-
-You can change the speed of animation by set the circle animation duration or whole animation rotating duration(MS):
+#### 设置速度
+通过设置环绕动画的时间和整体旋转的时间来改变速度：
 
 xml:
 ```xml
@@ -85,15 +84,15 @@ java:
   mInsLoadingView.setCircleDuration(2000);
   mInsLoadingView.setRotateDuration(10000);
 ```
-The default circle duration and rotate duration is 2000ms and 10000ms.
+默认的时间为2000ms和10000ms。
 
-## Contact me
+## 关于我
 
 [Email](mailto:qintong5900@163.com)
 
 [My Blog](http://www.jianshu.com/u/d2b8b611095d)
 
-### License
+### 许可
 ```
 Copyright 2017 Qin Tong
 
