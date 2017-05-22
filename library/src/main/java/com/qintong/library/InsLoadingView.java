@@ -30,6 +30,7 @@ public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
     private static boolean DEBUG = BuildConfig.DEBUG;
     private static final float ARC_WIDTH = 12;
+    private static final int MIN_WIDTH = 300;
 
     public enum Status {LOADING, CLICKED, UNCLICKED}
 
@@ -57,6 +58,7 @@ public class InsLoadingView extends ImageView {
     private ValueAnimator mTouchAnim;
     private int mStartColor = Color.parseColor("#FFF700C2");
     private int mEndColor = Color.parseColor("#FFFFD900");
+    private int mClickedColor = Color.LTGRAY;
     private float mScale = 1f;
 
     public InsLoadingView(Context context) {
@@ -119,7 +121,7 @@ public class InsLoadingView extends ImageView {
             width = Math.min(widthSpecSize, heightSpecSize);
         } else {
             width = Math.min(widthSpecSize, heightSpecSize);
-            width = Math.min(width, 300);
+            width = Math.min(width, MIN_WIDTH);
         }
         setMeasuredDimension(width, width);
     }
@@ -127,11 +129,7 @@ public class InsLoadingView extends ImageView {
     @Override
     protected synchronized void onDraw(Canvas canvas) {
         canvas.scale(mScale, mScale, centerX(), centerY());
-        Paint bitmapPaint = new Paint();
-        setBitmapShader(bitmapPaint);
-        RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
-                getWidth() * bitmapDia, getHeight() * bitmapDia);
-        canvas.drawOval(rectF, bitmapPaint);
+        drawBitmap(canvas);
         Paint paint = getPaint(getColor(0), getColor(360), 360);
         switch (mStatus) {
             case LOADING:
@@ -143,7 +141,7 @@ public class InsLoadingView extends ImageView {
             case CLICKED:
                 // TO DO
                 Paint paintClicked = new Paint();
-                paintClicked.setColor(Color.LTGRAY);
+                paintClicked.setColor(mClickedColor);
                 setPaintStroke(paintClicked);
                 drawCircle(canvas, paintClicked);
                 break;
@@ -279,6 +277,14 @@ public class InsLoadingView extends ImageView {
         startAnim();
     }
 
+    private void drawBitmap(Canvas canvas) {
+        Paint bitmapPaint = new Paint();
+        setBitmapShader(bitmapPaint);
+        RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
+                getWidth() * bitmapDia, getHeight() * bitmapDia);
+        canvas.drawOval(rectF, bitmapPaint);
+    }
+
     private void drawTrack(Canvas canvas, Paint paint) {
         canvas.rotate(degress, centerX(), centerY());
         canvas.rotate(ARC_WIDTH, centerX(), centerY());
@@ -388,9 +394,8 @@ public class InsLoadingView extends ImageView {
         }
         Bitmap bitmap = drawableToBitmap(drawable);
         BitmapShader tshader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        float scale = 1.0f;
         int bSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
-        scale = getWidth() * 1.0f / bSize;
+        float scale = getWidth() * 1.0f / bSize;
         matrix.setScale(scale, scale);
         if (bitmap.getWidth() > bitmap.getHeight()) {
             matrix.postTranslate(-(bitmap.getWidth() * scale - getWidth()) / 2, 0);

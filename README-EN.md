@@ -16,7 +16,7 @@ Add dependencies in build.gradle.
 
 ```
 dependencies {
-  compile 'com.qintong:insLoadingAnimation:0.9.1'
+  compile 'com.qintong:insLoadingAnimation:1.0.1'
 }
 ```
 
@@ -86,6 +86,12 @@ java:
   mInsLoadingView.setRotateDuration(10000);
 ```
 The default circle duration and rotate duration is 2000ms and 10000ms.
+
+## Contact me
+
+[Email](mailto:qintong5900@163.com)
+
+[My Blog](http://www.jianshu.com/u/d2b8b611095d)
 
 ### License
 ```

@@ -16,7 +16,7 @@ InsLoadingAnimation 是仿instagram和微博的头像点击进行加载的Androi
 
 ```
 dependencies {
-  compile 'com.qintong:insLoadingAnimation:0.9.1'
+  compile 'com.qintong:insLoadingAnimation:1.0.1'
 }
 ```
 
@@ -85,6 +85,12 @@ java:
   mInsLoadingView.setRotateDuration(10000);
 ```
 默认的时间为2000ms和10000ms。
+
+## 关于我
+
+[Email](mailto:qintong5900@163.com)
+
+[My Blog](http://www.jianshu.com/u/d2b8b611095d)
 
 ### 许可
 ```
