@@ -31,6 +31,7 @@ public class InsLoadingView extends ImageView {
     private static boolean DEBUG = BuildConfig.DEBUG;
     private static final float ARC_WIDTH = 12;
     private static final int MIN_WIDTH = 300;
+    private int sClickedColor = Color.LTGRAY;
 
     public enum Status {LOADING, CLICKED, UNCLICKED}
 
@@ -58,7 +59,6 @@ public class InsLoadingView extends ImageView {
     private ValueAnimator mTouchAnim;
     private int mStartColor = Color.parseColor("#FFF700C2");
     private int mEndColor = Color.parseColor("#FFFFD900");
-    private int mClickedColor = Color.LTGRAY;
     private float mScale = 1f;
 
     public InsLoadingView(Context context) {
@@ -130,7 +130,7 @@ public class InsLoadingView extends ImageView {
     protected synchronized void onDraw(Canvas canvas) {
         canvas.scale(mScale, mScale, centerX(), centerY());
         drawBitmap(canvas);
-        Paint paint = getPaint(getColor(0), getColor(360), 360);
+        Paint paint = getPaint(mStartColor, mEndColor, 360);
         switch (mStatus) {
             case LOADING:
                 drawTrack(canvas, paint);
@@ -139,11 +139,7 @@ public class InsLoadingView extends ImageView {
                 drawCircle(canvas, paint);
                 break;
             case CLICKED:
-                // TO DO
-                Paint paintClicked = new Paint();
-                paintClicked.setColor(mClickedColor);
-                setPaintStroke(paintClicked);
-                drawCircle(canvas, paintClicked);
+                drawClickedircle(canvas);
                 break;
         }
     }
@@ -334,6 +330,13 @@ public class InsLoadingView extends ImageView {
         canvas.drawOval(rectF, paint);
     }
 
+    private void drawClickedircle(Canvas canvas) {
+        Paint paintClicked = new Paint();
+        paintClicked.setColor(sClickedColor);
+        setPaintStroke(paintClicked);
+        drawCircle(canvas, paintClicked);
+    }
+
     private void startDownAnim() {
         mTouchAnim.setFloatValues(mScale, 0.9f);
         mTouchAnim.start();
@@ -353,23 +356,6 @@ public class InsLoadingView extends ImageView {
     private void endAnim() {
         mRotateAnim.end();
         mCircleAnim.end();
-    }
-
-    private int getColor(double degree) {
-        if (degree < 0 || degree > 360) {
-            Log.w(TAG, "getColor error:" + degree);
-        }
-        double radio = degree / 360;
-        int redStart = Color.red(mStartColor);
-        int blueStart = Color.blue(mStartColor);
-        int greenStart = Color.green(mStartColor);
-        int redEnd = Color.red(mEndColor);
-        int blueEnd = Color.blue(mEndColor);
-        int greenEnd = Color.green(mEndColor);
-        int red = (int) (redStart + ((redEnd - redStart) * radio + 0.5));
-        int greed = (int) (greenStart + ((greenEnd - greenStart) * radio + 0.5));
-        int blue = (int) (blueStart + ((blueEnd - blueStart) * radio + 0.5));
-        return Color.argb(255, red, greed, blue);
     }
 
     private Paint getPaint(int startColor, int endColor, double arcWidth) {
