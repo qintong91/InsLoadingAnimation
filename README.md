@@ -4,7 +4,7 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-InsLoadingAnimation-red.svg?style=flat)](https://android-arsenal.com/details/1/5789)
 
 ## Introduction
-InsLoadingAnimation is imitation of instagram and weibo avator animation of loading for Android.
+InsLoadingAnimation is imitation of instagram and weibo avator animation of loading for Android. More information and code analysis please see blog: http://www.jianshu.com/p/a0e2dbeef88a
 
 ## Demo
 ![avi](screenshots/demo.gif)
