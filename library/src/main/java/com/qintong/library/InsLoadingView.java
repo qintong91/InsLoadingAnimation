@@ -28,7 +28,7 @@ import static android.graphics.Shader.TileMode.CLAMP;
 
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = BuildConfig.DEBUG;
     private static final float ARC_WIDTH = 12;
     private static final int MIN_WIDTH = 300;
     private static final float circleDia = 0.9f;
