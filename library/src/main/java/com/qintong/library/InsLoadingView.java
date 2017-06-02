@@ -28,10 +28,13 @@ import static android.graphics.Shader.TileMode.CLAMP;
 
 public class InsLoadingView extends ImageView {
     private static String TAG = "InsLoadingView";
-    private static boolean DEBUG = BuildConfig.DEBUG;
+    private static boolean DEBUG = true;
     private static final float ARC_WIDTH = 12;
     private static final int MIN_WIDTH = 300;
-    private int sClickedColor = Color.LTGRAY;
+    private static final float circleDia = 0.9f;
+    private static final float strokeWidth = 0.025f;
+    private static final float arcChangeAngle = 0.2f;
+    private static final int sClickedColor = Color.LTGRAY;
 
     public enum Status {LOADING, CLICKED, UNCLICKED}
 
@@ -47,9 +50,6 @@ public class InsLoadingView extends ImageView {
     private Status mStatus = Status.LOADING;
     private int mRotateDuration = 10000;
     private int mCircleDuration = 2000;
-    private float circleDia = 0.9f;
-    private float strokeWidth = 0.025f;
-    private float arcChangeAngle = 0.2f;
     private float bitmapDia = circleDia - strokeWidth;
     private float degress;
     private float cricleWidth;
@@ -60,22 +60,24 @@ public class InsLoadingView extends ImageView {
     private int mStartColor = Color.parseColor("#FFF700C2");
     private int mEndColor = Color.parseColor("#FFFFD900");
     private float mScale = 1f;
+    private Paint mBitmapPaint;
+    private Paint mTrackPaint;
+    private RectF mBitmapRectF;
+    private RectF mTrackRectF;
 
     public InsLoadingView(Context context) {
         super(context);
-        onCreateAnimators();
+        init(context , null);
     }
 
     public InsLoadingView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        praseAttrs(context, attrs);
-        onCreateAnimators();
+        init(context, attrs);
     }
 
     public InsLoadingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        praseAttrs(context, attrs);
-        onCreateAnimators();
+        init(context, attrs);
     }
 
     public InsLoadingView setCircleDuration(int circleDuration) {
@@ -100,21 +102,23 @@ public class InsLoadingView extends ImageView {
 
     public void setStartColor(int startColor) {
         mStartColor = startColor;
+        mTrackPaint = null;
     }
 
     public void setEndColor(int endColor) {
         mEndColor = endColor;
+        mTrackPaint = null;
     }
 
     @Override
-    protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
         final int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
         final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
         final int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
         if (DEBUG) {
-            Log.d(TAG, "onMeasure widthMeasureSpec:" + widthSpecMode + "--" + widthSpecSize);
-            Log.d(TAG, "onMeasure heightMeasureSpec:" + heightSpecMode + "--" + heightSpecSize);
+            Log.d(TAG, String.format("onMeasure widthMeasureSpec: %s -- %s", widthSpecMode, widthSpecSize));
+            Log.d(TAG, String.format("onMeasure heightMeasureSpec: %s -- %s", heightSpecMode, heightSpecSize));
         }
         int width;
         if (widthSpecMode == MeasureSpec.EXACTLY && heightSpecMode == MeasureSpec.EXACTLY) {
@@ -127,16 +131,17 @@ public class InsLoadingView extends ImageView {
     }
 
     @Override
-    protected synchronized void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas) {
+        initPaints();
+        initRectFs();
         canvas.scale(mScale, mScale, centerX(), centerY());
         drawBitmap(canvas);
-        Paint paint = getPaint(mStartColor, mEndColor, 360);
         switch (mStatus) {
             case LOADING:
-                drawTrack(canvas, paint);
+                drawTrack(canvas, mTrackPaint);
                 break;
             case UNCLICKED:
-                drawCircle(canvas, paint);
+                drawCircle(canvas, mTrackPaint);
                 break;
             case CLICKED:
                 drawClickedircle(canvas);
@@ -146,7 +151,9 @@ public class InsLoadingView extends ImageView {
 
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
-        Log.d(TAG, "onVisibilityChanged");
+        if (DEBUG) {
+            Log.d(TAG, "onVisibilityChanged");
+        }
         if (visibility == View.VISIBLE) {
             startAnim();
         } else {
@@ -179,6 +186,34 @@ public class InsLoadingView extends ImageView {
         return super.onTouchEvent(event) || result;
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        if (DEBUG) {
+            Log.d(TAG, "onSizeChanged");
+        }
+        mBitmapRectF = null;
+        mTrackRectF = null;
+        mBitmapPaint = null;
+        mTrackPaint = null;
+        super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    @Override
+    public void setImageDrawable(Drawable drawable) {
+        if (DEBUG) {
+            Log.d(TAG, "setImageDrawable");
+        }
+        mBitmapPaint = null;
+        super.setImageDrawable(drawable);
+    }
+
+    private void init(Context context, AttributeSet attrs) {
+        if (attrs != null) {
+            praseAttrs(context, attrs);
+        }
+        onCreateAnimators();
+    }
+
     private void praseAttrs(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.InsLoadingViewAttr);
         int startColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mStartColor);
@@ -202,6 +237,26 @@ public class InsLoadingView extends ImageView {
         setStartColor(startColor);
         setEndColor(endColor);
         setStatus(sStatusArray.get(status));
+    }
+
+    private void initPaints() {
+        if (mBitmapPaint == null) {
+            mBitmapPaint = getmBitmapPaint();
+        }
+        if (mTrackPaint == null) {
+            mTrackPaint = getTrackPaint();
+        }
+    }
+
+    private void initRectFs() {
+        if (mBitmapRectF == null) {
+            mBitmapRectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
+                    getWidth() * bitmapDia, getHeight() * bitmapDia);
+        }
+        if (mTrackRectF == null) {
+            mTrackRectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
+                    getWidth() * circleDia, getHeight() * circleDia);
+        }
     }
 
     private float centerX() {
@@ -274,31 +329,26 @@ public class InsLoadingView extends ImageView {
     }
 
     private void drawBitmap(Canvas canvas) {
-        Paint bitmapPaint = new Paint();
-        setBitmapShader(bitmapPaint);
-        RectF rectF = new RectF(getWidth() * (1 - bitmapDia), getWidth() * (1 - bitmapDia),
-                getWidth() * bitmapDia, getHeight() * bitmapDia);
-        canvas.drawOval(rectF, bitmapPaint);
+        canvas.drawOval(mBitmapRectF, mBitmapPaint);
     }
 
     private void drawTrack(Canvas canvas, Paint paint) {
         canvas.rotate(degress, centerX(), centerY());
         canvas.rotate(ARC_WIDTH, centerX(), centerY());
-        RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
-                getWidth() * circleDia, getHeight() * circleDia);
+
         if (DEBUG) {
             Log.d(TAG, "cricleWidth:" + cricleWidth);
         }
         if (cricleWidth < 0) {
             //a
             float startArg = cricleWidth + 360;
-            canvas.drawArc(rectF, startArg, 360 - startArg, false, paint);
+            canvas.drawArc(mTrackRectF, startArg, 360 - startArg, false, paint);
             float adjustCricleWidth = cricleWidth + 360;
             float width = 8;
             while (adjustCricleWidth > ARC_WIDTH) {
                 width = width - arcChangeAngle;
                 adjustCricleWidth = adjustCricleWidth - ARC_WIDTH;
-                canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
+                canvas.drawArc(mTrackRectF, adjustCricleWidth, width, false, paint);
             }
         } else {
             //b
@@ -306,10 +356,10 @@ public class InsLoadingView extends ImageView {
                 if (ARC_WIDTH * i > cricleWidth) {
                     break;
                 }
-                canvas.drawArc(rectF, cricleWidth - ARC_WIDTH * i, 8 + i, false, paint);
+                canvas.drawArc(mTrackRectF, cricleWidth - ARC_WIDTH * i, 8 + i, false, paint);
             }
             if (cricleWidth > ARC_WIDTH * 4) {
-                canvas.drawArc(rectF, 0, cricleWidth - ARC_WIDTH * 4, false, paint);
+                canvas.drawArc(mTrackRectF, 0, cricleWidth - ARC_WIDTH * 4, false, paint);
             }
             float adjustCricleWidth = 360;
             float width = 8 * (360 - cricleWidth) / 360;
@@ -319,7 +369,7 @@ public class InsLoadingView extends ImageView {
             while (width > 0 && adjustCricleWidth > ARC_WIDTH) {
                 width = width - arcChangeAngle;
                 adjustCricleWidth = adjustCricleWidth - ARC_WIDTH;
-                canvas.drawArc(rectF, adjustCricleWidth, width, false, paint);
+                canvas.drawArc(mTrackRectF, adjustCricleWidth, width, false, paint);
             }
         }
     }
@@ -358,10 +408,10 @@ public class InsLoadingView extends ImageView {
         mCircleAnim.end();
     }
 
-    private Paint getPaint(int startColor, int endColor, double arcWidth) {
+    private Paint getTrackPaint() {
         Paint paint = new Paint();
-        Shader shader = new LinearGradient(0f, 0f, (float) (getWidth() * circleDia * (arcWidth - ARC_WIDTH * 4) / 360),
-                getHeight() * strokeWidth, startColor, endColor, CLAMP);
+        Shader shader = new LinearGradient(0f, 0f, (getWidth() * circleDia * (360 - ARC_WIDTH * 4) / 360),
+                getHeight() * strokeWidth, mStartColor, mEndColor, CLAMP);
         paint.setShader(shader);
         setPaintStroke(paint);
         return paint;
@@ -372,11 +422,12 @@ public class InsLoadingView extends ImageView {
         paint.setStrokeWidth(getHeight() * strokeWidth);
     }
 
-    private void setBitmapShader(Paint paint) {
+    private Paint getmBitmapPaint() {
+        Paint paint = new Paint();
         Drawable drawable = getDrawable();
         Matrix matrix = new Matrix();
         if (null == drawable) {
-            return;
+            return paint;
         }
         Bitmap bitmap = drawableToBitmap(drawable);
         BitmapShader tshader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
@@ -390,6 +441,7 @@ public class InsLoadingView extends ImageView {
         }
         tshader.setLocalMatrix(matrix);
         paint.setShader(tshader);
+        return paint;
     }
 
     private Bitmap drawableToBitmap(Drawable drawable) {
