@@ -18,7 +18,7 @@ Add dependencies in build.gradle.
 
 ```
 dependencies {
-  compile 'com.qintong:insLoadingAnimation:1.0.1'
+  compile 'com.qintong:insLoadingAnimation:1.1.0'
 }
 ```
 

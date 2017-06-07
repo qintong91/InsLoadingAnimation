@@ -18,7 +18,7 @@ InsLoadingAnimation 是仿instagram和微博的头像点击进行加载的Androi
 
 ```
 dependencies {
-  compile 'com.qintong:insLoadingAnimation:1.0.1'
+  compile 'com.qintong:insLoadingAnimation:1.1.0'
 }
 ```
 
