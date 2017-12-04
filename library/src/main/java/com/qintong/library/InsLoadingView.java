@@ -144,7 +144,7 @@ public class InsLoadingView extends ImageView {
                 drawCircle(canvas, mTrackPaint);
                 break;
             case CLICKED:
-                drawClickedircle(canvas);
+                drawClickedCircle(canvas);
                 break;
         }
     }
@@ -209,25 +209,26 @@ public class InsLoadingView extends ImageView {
 
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null) {
-            praseAttrs(context, attrs);
+            parseAttrs(context, attrs);
         }
         onCreateAnimators();
     }
 
-    private void praseAttrs(Context context, AttributeSet attrs) {
+    private void parseAttrs(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.InsLoadingViewAttr);
         int startColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mStartColor);
-        int endColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mEndColor);
+        int endColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_end_color, mEndColor);
         int circleDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_circle_duration, mCircleDuration);
         int rotateDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_rotate_duration, mRotateDuration);
         int status = typedArray.getInt(R.styleable.InsLoadingViewAttr_status, 0);
         if (DEBUG) {
-            Log.d(TAG, "praseAttrs start_color: " + startColor);
-            Log.d(TAG, "praseAttrs end_color: " + endColor);
-            Log.d(TAG, "praseAttrs rotate_duration: " + rotateDuration);
-            Log.d(TAG, "praseAttrs circle_duration: " + circleDuration);
-            Log.d(TAG, "praseAttrs status: " + status);
+            Log.d(TAG, "parseAttrs start_color: " + startColor);
+            Log.d(TAG, "parseAttrs end_color: " + endColor);
+            Log.d(TAG, "parseAttrs rotate_duration: " + rotateDuration);
+            Log.d(TAG, "parseAttrs circle_duration: " + circleDuration);
+            Log.d(TAG, "parseAttrs status: " + status);
         }
+        typedArray.recycle();
         if (circleDuration != mCircleDuration) {
             setCircleDuration(circleDuration);
         }
@@ -380,7 +381,7 @@ public class InsLoadingView extends ImageView {
         canvas.drawOval(rectF, paint);
     }
 
-    private void drawClickedircle(Canvas canvas) {
+    private void drawClickedCircle(Canvas canvas) {
         Paint paintClicked = new Paint();
         paintClicked.setColor(sClickedColor);
         setPaintStroke(paintClicked);
