@@ -31,10 +31,10 @@ public class InsLoadingView extends ImageView {
     private static boolean DEBUG = BuildConfig.DEBUG;
     private static final float ARC_WIDTH = 12;
     private static final int MIN_WIDTH = 300;
-    private static final float circleDia = 0.9f;
-    private static final float strokeWidth = 0.025f;
-    private static final float arcChangeAngle = 0.2f;
-    private static final int sClickedColor = Color.LTGRAY;
+    private static final float CIRCLE_DIA = 0.9f;
+    private static final float STROKE_WIDTH = 0.025f;
+    private static final float ARC_CHANGE_ANGLE = 0.2f;
+    private static final int CLICKED_COLOR = Color.LTGRAY;
 
     public enum Status {LOADING, CLICKED, UNCLICKED}
 
@@ -50,10 +50,10 @@ public class InsLoadingView extends ImageView {
     private Status mStatus = Status.LOADING;
     private int mRotateDuration = 10000;
     private int mCircleDuration = 2000;
-    private float bitmapDia = circleDia - strokeWidth;
-    private float degress;
-    private float cricleWidth;
-    private boolean isFirstCircle = true;
+    private float bitmapDia = CIRCLE_DIA - STROKE_WIDTH;
+    private float mRotateDegree;
+    private float mCircleWidth;
+    private boolean mIsFirstCircle = true;
     private ValueAnimator mRotateAnim;
     private ValueAnimator mCircleAnim;
     private ValueAnimator mTouchAnim;
@@ -242,7 +242,7 @@ public class InsLoadingView extends ImageView {
 
     private void initPaints() {
         if (mBitmapPaint == null) {
-            mBitmapPaint = getmBitmapPaint();
+            mBitmapPaint = getBitmapPaint();
         }
         if (mTrackPaint == null) {
             mTrackPaint = getTrackPaint();
@@ -255,8 +255,8 @@ public class InsLoadingView extends ImageView {
                     getWidth() * bitmapDia, getHeight() * bitmapDia);
         }
         if (mTrackRectF == null) {
-            mTrackRectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
-                    getWidth() * circleDia, getHeight() * circleDia);
+            mTrackRectF = new RectF(getWidth() * (1 - CIRCLE_DIA), getWidth() * (1 - CIRCLE_DIA),
+                    getWidth() * CIRCLE_DIA, getHeight() * CIRCLE_DIA);
         }
     }
 
@@ -273,7 +273,7 @@ public class InsLoadingView extends ImageView {
         mRotateAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                degress = (float) animation.getAnimatedValue();
+                mRotateDegree = (float) animation.getAnimatedValue();
                 postInvalidate();
             }
         });
@@ -287,10 +287,10 @@ public class InsLoadingView extends ImageView {
         mCircleAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                if (isFirstCircle) {
-                    cricleWidth = (float) animation.getAnimatedValue();
+                if (mIsFirstCircle) {
+                    mCircleWidth = (float) animation.getAnimatedValue();
                 } else {
-                    cricleWidth = (float) animation.getAnimatedValue() - 360;
+                    mCircleWidth = (float) animation.getAnimatedValue() - 360;
                 }
                 postInvalidate();
             }
@@ -313,7 +313,7 @@ public class InsLoadingView extends ImageView {
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                isFirstCircle = !isFirstCircle;
+                mIsFirstCircle = !mIsFirstCircle;
             }
         });
         mTouchAnim = new ValueAnimator();
@@ -334,56 +334,56 @@ public class InsLoadingView extends ImageView {
     }
 
     private void drawTrack(Canvas canvas, Paint paint) {
-        canvas.rotate(degress, centerX(), centerY());
+        canvas.rotate(mRotateDegree, centerX(), centerY());
         canvas.rotate(ARC_WIDTH, centerX(), centerY());
 
         if (DEBUG) {
-            Log.d(TAG, "cricleWidth:" + cricleWidth);
+            Log.d(TAG, "circleWidth:" + mCircleWidth);
         }
-        if (cricleWidth < 0) {
+        if (mCircleWidth < 0) {
             //a
-            float startArg = cricleWidth + 360;
+            float startArg = mCircleWidth + 360;
             canvas.drawArc(mTrackRectF, startArg, 360 - startArg, false, paint);
-            float adjustCricleWidth = cricleWidth + 360;
+            float adjustCircleWidth = mCircleWidth + 360;
             float width = 8;
-            while (adjustCricleWidth > ARC_WIDTH) {
-                width = width - arcChangeAngle;
-                adjustCricleWidth = adjustCricleWidth - ARC_WIDTH;
-                canvas.drawArc(mTrackRectF, adjustCricleWidth, width, false, paint);
+            while (adjustCircleWidth > ARC_WIDTH) {
+                width = width - ARC_CHANGE_ANGLE;
+                adjustCircleWidth = adjustCircleWidth - ARC_WIDTH;
+                canvas.drawArc(mTrackRectF, adjustCircleWidth, width, false, paint);
             }
         } else {
             //b
             for (int i = 0; i <= 4; i++) {
-                if (ARC_WIDTH * i > cricleWidth) {
+                if (ARC_WIDTH * i > mCircleWidth) {
                     break;
                 }
-                canvas.drawArc(mTrackRectF, cricleWidth - ARC_WIDTH * i, 8 + i, false, paint);
+                canvas.drawArc(mTrackRectF, mCircleWidth - ARC_WIDTH * i, 8 + i, false, paint);
             }
-            if (cricleWidth > ARC_WIDTH * 4) {
-                canvas.drawArc(mTrackRectF, 0, cricleWidth - ARC_WIDTH * 4, false, paint);
+            if (mCircleWidth > ARC_WIDTH * 4) {
+                canvas.drawArc(mTrackRectF, 0, mCircleWidth - ARC_WIDTH * 4, false, paint);
             }
-            float adjustCricleWidth = 360;
-            float width = 8 * (360 - cricleWidth) / 360;
+            float adjustCircleWidth = 360;
+            float width = 8 * (360 - mCircleWidth) / 360;
             if (DEBUG) {
                 Log.d(TAG, "width:" + width);
             }
-            while (width > 0 && adjustCricleWidth > ARC_WIDTH) {
-                width = width - arcChangeAngle;
-                adjustCricleWidth = adjustCricleWidth - ARC_WIDTH;
-                canvas.drawArc(mTrackRectF, adjustCricleWidth, width, false, paint);
+            while (width > 0 && adjustCircleWidth > ARC_WIDTH) {
+                width = width - ARC_CHANGE_ANGLE;
+                adjustCircleWidth = adjustCircleWidth - ARC_WIDTH;
+                canvas.drawArc(mTrackRectF, adjustCircleWidth, width, false, paint);
             }
         }
     }
 
     private void drawCircle(Canvas canvas, Paint paint) {
-        RectF rectF = new RectF(getWidth() * (1 - circleDia), getWidth() * (1 - circleDia),
-                getWidth() * circleDia, getHeight() * circleDia);
+        RectF rectF = new RectF(getWidth() * (1 - CIRCLE_DIA), getWidth() * (1 - CIRCLE_DIA),
+                getWidth() * CIRCLE_DIA, getHeight() * CIRCLE_DIA);
         canvas.drawOval(rectF, paint);
     }
 
     private void drawClickedCircle(Canvas canvas) {
         Paint paintClicked = new Paint();
-        paintClicked.setColor(sClickedColor);
+        paintClicked.setColor(CLICKED_COLOR);
         setPaintStroke(paintClicked);
         drawCircle(canvas, paintClicked);
     }
@@ -411,8 +411,8 @@ public class InsLoadingView extends ImageView {
 
     private Paint getTrackPaint() {
         Paint paint = new Paint();
-        Shader shader = new LinearGradient(0f, 0f, (getWidth() * circleDia * (360 - ARC_WIDTH * 4) / 360),
-                getHeight() * strokeWidth, mStartColor, mEndColor, CLAMP);
+        Shader shader = new LinearGradient(0f, 0f, (getWidth() * CIRCLE_DIA * (360 - ARC_WIDTH * 4) / 360),
+                getHeight() * STROKE_WIDTH, mStartColor, mEndColor, CLAMP);
         paint.setShader(shader);
         setPaintStroke(paint);
         return paint;
@@ -420,10 +420,10 @@ public class InsLoadingView extends ImageView {
 
     private void setPaintStroke(Paint paint) {
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(getHeight() * strokeWidth);
+        paint.setStrokeWidth(getHeight() * STROKE_WIDTH);
     }
 
-    private Paint getmBitmapPaint() {
+    private Paint getBitmapPaint() {
         Paint paint = new Paint();
         Drawable drawable = getDrawable();
         Matrix matrix = new Matrix();
@@ -431,17 +431,17 @@ public class InsLoadingView extends ImageView {
             return paint;
         }
         Bitmap bitmap = drawableToBitmap(drawable);
-        BitmapShader tshader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        int bSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
-        float scale = getWidth() * 1.0f / bSize;
+        BitmapShader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        float scale = getWidth() * 1.0f / size;
         matrix.setScale(scale, scale);
         if (bitmap.getWidth() > bitmap.getHeight()) {
             matrix.postTranslate(-(bitmap.getWidth() * scale - getWidth()) / 2, 0);
         } else {
             matrix.postTranslate(0, -(bitmap.getHeight() * scale - getHeight()) / 2);
         }
-        tshader.setLocalMatrix(matrix);
-        paint.setShader(tshader);
+        shader.setLocalMatrix(matrix);
+        paint.setShader(shader);
         return paint;
     }
 
