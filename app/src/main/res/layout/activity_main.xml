@@ -16,6 +16,7 @@
         android:layout_centerInParent="true"
         android:scaleType="centerCrop"
         android:src="@drawable/pink"
+        app:stroke_width="1dp"
         app:clicked_color="@color/colorGrey"
         app:corners="round"
         app:end_color="@color/colorGradientEnd"
