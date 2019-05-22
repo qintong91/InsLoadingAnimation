@@ -14,7 +14,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@mipmap/pink"
+        android:scaleType="centerCrop"
+        android:src="@drawable/pink"
+        app:clicked_color="@color/colorGrey"
+        app:corners="round"
+        app:end_color="@color/colorGradientEnd"
+        app:start_color="@color/colorGradientStart"
         app:status="loading" />
 
 </RelativeLayout>

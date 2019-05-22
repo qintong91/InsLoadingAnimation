@@ -33,13 +33,16 @@ class InsLoadingView @JvmOverloads constructor(
     private var mRotateAnim: ValueAnimator? = null
     private var mCircleAnim: ValueAnimator? = null
     private var mTouchAnim: ValueAnimator? = null
-    private var mStartColor = Color.parseColor("#FFF700C2")
-    private var mEndColor = Color.parseColor("#FFFFD900")
+    private var mStartColor = Color.TRANSPARENT
+    private var mEndColor = Color.TRANSPARENT
+    private var mClickedColor = CLICKED_COLOR
     private var mScale = 1f
     private var mBitmapPaint: Paint? = null
     private var mTrackPaint: Paint? = null
     private var mBitmapRectF: RectF? = null
     private var mTrackRectF: RectF? = null
+    private var cap: Paint.Cap = Paint.Cap.ROUND
+    private var join: Paint.Join = Paint.Join.ROUND
 
     private val trackPaint: Paint
         get() {
@@ -199,9 +202,18 @@ class InsLoadingView @JvmOverloads constructor(
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.InsLoadingViewAttr)
         val startColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_start_color, mStartColor)
         val endColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_end_color, mEndColor)
+        val clickedColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_clicked_color, mClickedColor)
         val circleDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_circle_duration, mCircleDuration)
         val rotateDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_rotate_duration, mRotateDuration)
         val status1 = typedArray.getInt(R.styleable.InsLoadingViewAttr_status, 0)
+        val corners = typedArray.getInt(R.styleable.InsLoadingViewAttr_corners, 0)
+        if (corners == 0) {
+            cap = Paint.Cap.ROUND
+            join = Paint.Join.ROUND
+        } else {
+            cap = Paint.Cap.SQUARE
+            join = Paint.Join.MITER
+        }
         if (DEBUG) {
             Log.d(TAG, "parseAttrs start_color: $startColor")
             Log.d(TAG, "parseAttrs end_color: $endColor")
@@ -219,6 +231,7 @@ class InsLoadingView @JvmOverloads constructor(
         setStartColor(startColor)
         setEndColor(endColor)
         status = sStatusArray!!.get(status1)
+        mClickedColor = clickedColor
     }
 
     private fun initPaints() {
@@ -358,7 +371,7 @@ class InsLoadingView @JvmOverloads constructor(
     private fun drawClickedCircle(canvas: Canvas) {
         val paintClicked = Paint()
         paintClicked.isAntiAlias = true
-        paintClicked.color = CLICKED_COLOR
+        paintClicked.color = mClickedColor
         setPaintStroke(paintClicked)
         drawCircle(canvas, paintClicked)
     }
@@ -386,6 +399,8 @@ class InsLoadingView @JvmOverloads constructor(
     private fun setPaintStroke(paint: Paint) {
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = height * STROKE_WIDTH
+        paint.strokeCap = cap
+        paint.strokeJoin = join
     }
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
