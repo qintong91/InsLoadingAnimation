@@ -26,9 +26,10 @@ class InsLoadingView @JvmOverloads constructor(
     var status = Status.LOADING
     private var mRotateDuration = 10000
     private var mCircleDuration = 2000
-    private val bitmapDia = CIRCLE_DIA - STROKE_WIDTH
     private var mRotateDegree: Float = 0.toFloat()
     private var mCircleWidth: Float = 0.toFloat()
+    private var mStrokeWidth: Float = STROKE_WIDTH / 100
+    private var bitmapDia = CIRCLE_DIA - mStrokeWidth
     private var mIsFirstCircle = true
     private var mRotateAnim: ValueAnimator? = null
     private var mCircleAnim: ValueAnimator? = null
@@ -50,7 +51,7 @@ class InsLoadingView @JvmOverloads constructor(
             paint.isAntiAlias = true
             val shader = LinearGradient(
                 0f, 0f, width.toFloat() * CIRCLE_DIA * (360 - ARC_WIDTH * 4) / 360,
-                height * STROKE_WIDTH, mStartColor, mEndColor, CLAMP
+                height * mStrokeWidth, mStartColor, mEndColor, CLAMP
             )
             paint.shader = shader
             setPaintStroke(paint)
@@ -205,6 +206,7 @@ class InsLoadingView @JvmOverloads constructor(
         val clickedColor = typedArray.getColor(R.styleable.InsLoadingViewAttr_clicked_color, mClickedColor)
         val circleDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_circle_duration, mCircleDuration)
         val rotateDuration = typedArray.getInt(R.styleable.InsLoadingViewAttr_rotate_duration, mRotateDuration)
+        val strokeWidth = typedArray.getDimension(R.styleable.InsLoadingViewAttr_stroke_width, mStrokeWidth)
         val status1 = typedArray.getInt(R.styleable.InsLoadingViewAttr_status, 0)
         val corners = typedArray.getInt(R.styleable.InsLoadingViewAttr_corners, 0)
         if (corners == 0) {
@@ -232,6 +234,8 @@ class InsLoadingView @JvmOverloads constructor(
         setEndColor(endColor)
         status = sStatusArray!!.get(status1)
         mClickedColor = clickedColor
+        mStrokeWidth = strokeWidth / 100
+        bitmapDia = CIRCLE_DIA - mStrokeWidth
     }
 
     private fun initPaints() {
@@ -398,7 +402,7 @@ class InsLoadingView @JvmOverloads constructor(
 
     private fun setPaintStroke(paint: Paint) {
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = height * STROKE_WIDTH
+        paint.strokeWidth = height * mStrokeWidth
         paint.strokeCap = cap
         paint.strokeJoin = join
     }
@@ -422,7 +426,7 @@ class InsLoadingView @JvmOverloads constructor(
         private const val ARC_WIDTH = 12f
         private const val MIN_WIDTH = 300
         private const val CIRCLE_DIA = 0.9f
-        private const val STROKE_WIDTH = 0.025f
+        private const val STROKE_WIDTH = 1f
         private const val ARC_CHANGE_ANGLE = 0.2f
         private const val CLICKED_COLOR = Color.LTGRAY
 
