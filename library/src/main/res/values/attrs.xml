@@ -3,12 +3,18 @@
     <declare-styleable name="InsLoadingViewAttr">
         <attr name="rotate_duration" format="integer" />
         <attr name="circle_duration" format="integer" />
+        <attr name="stroke_width" format="dimension" />
         <attr name="start_color" format="color" />
         <attr name="end_color" format="color" />
-        <attr name="status" >
+        <attr name="clicked_color" format="color" />
+        <attr name="status">
             <enum name="loading" value="0" />
             <enum name="clicked" value="1" />
             <enum name="unclicked" value="2" />
+        </attr>
+        <attr name="corners">
+            <enum name="round" value="0" />
+            <enum name="square" value="1" />
         </attr>
     </declare-styleable>
 </resources>
