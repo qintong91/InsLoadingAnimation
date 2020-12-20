@@ -48,7 +48,7 @@ Set status of InsLoadingView only requires the following code:
 
 xml:
 ```xml
-  app:status="loading" //or "clicked",or "clicked"
+  app:status="loading" //or "clicked",or "unclicked"
 ```
 
 java:
